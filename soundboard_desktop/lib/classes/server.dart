@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -58,17 +57,12 @@ class Server {
 
   Future<void> _handleReceivedData(Uint8List data) async {
     String msg = String.fromCharCodes(data);
-    Map<String, dynamic> map = jsonDecode(msg);
+    //Map<String, dynamic> map = jsonDecode(msg);
 
     _messaging.sink.add("Client sent data. ($msg)");
-
-    if (map["action"] == "playSound") {
-      print(map["soundId"]);
-    }
   }
 
   bool sendToClient(Object data, int index) {
-    print(clients.length);
     if (clients.length <= index) return false;
     clients[index].write(data);
     return true;

@@ -141,7 +141,6 @@ class _TestPageState extends State<TestPage> {
     Map<String, dynamic> map = {
       "image": myImage,
     };
-    bool s = server.sendToClient(jsonEncode(map), 0);
-    print(s ? "Success" : "Fail");
+    server.sendToClient(jsonEncode(map), 0);
   }
 }
