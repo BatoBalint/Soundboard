@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:soundboard_mobile/classes/server.dart';
 
@@ -11,11 +14,12 @@ class TestPage extends StatefulWidget {
 class _TestPageState extends State<TestPage> {
   String message = "";
   late Server server = Server();
+  Image img = Image.asset("assets/sadge.png");
 
   @override
   void initState() {
     super.initState();
-    server.serverInit();
+    server.setFunction(setImage);
   }
 
   @override
@@ -26,13 +30,44 @@ class _TestPageState extends State<TestPage> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(),
+          ElevatedButton(
+            onPressed: () {
+              server.connectToServer();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+            ),
+            child: const Text(
+              "Connect",
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
           spacer(),
           ElevatedButton(
             onPressed: () {
-              server.sendMessage("Almafa");
+              server.disconnectFromServer();
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text(
+              "Disconnect",
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+          spacer(),
+          ElevatedButton(
+            onPressed: () {
+              Map<String, dynamic> map = {
+                "action": "playSound",
+                "soundId": Random().nextInt(25),
+              };
+              server.sendMessage(jsonEncode(
+                map,
+              ));
             },
             child: const Text("Send message."),
           ),
+          spacer(),
+          img,
           spacer(),
           StreamBuilder(
             stream: server.getStream(),
@@ -40,10 +75,16 @@ class _TestPageState extends State<TestPage> {
               message += "${snapshot.data ?? ""}\n";
               return Text(message);
             },
-          )
+          ),
         ],
       ),
     );
+  }
+
+  void setImage(Image img2) {
+    setState(() {
+      img = img2;
+    });
   }
 
   Widget spacer() {

@@ -1,3 +1,7 @@
+import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:soundboard_desktop/classes/server.dart';
 
@@ -11,48 +15,69 @@ class TestPage extends StatefulWidget {
 class _TestPageState extends State<TestPage> {
   Server server = Server();
   String messages = "";
+  String _deviceIpAddress = "";
+  Image img = Image.asset("assets/szia.png");
+
+  @override
+  void initState() {
+    super.initState();
+    getIpAddress();
+  }
+
+  Future<void> getIpAddress() async {
+    var networkinterfaces = await NetworkInterface.list();
+    if (networkinterfaces.isNotEmpty &&
+        networkinterfaces[0].addresses.isNotEmpty) {
+      setState(() {
+        _deviceIpAddress = networkinterfaces[0].addresses[0].address;
+      });
+    } else {
+      setState(() {
+        _deviceIpAddress = "N/A";
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          spacer(),
-          Container(
-            width: double.infinity,
-          ),
-          ElevatedButton(
-            onPressed: startButtonClick,
-            style: const ButtonStyle(
-              backgroundColor: MaterialStatePropertyAll(Colors.green),
+      body: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Ip address: $_deviceIpAddress"),
+                Row(
+                  children: [
+                    testButton(),
+                    spacer(),
+                    startButton(),
+                    spacer(),
+                    stopButton(),
+                  ],
+                ),
+              ],
             ),
-            child: const Text(
-              "Start",
-              style: TextStyle(color: Colors.white),
+            Expanded(
+              child: SingleChildScrollView(
+                controller: ScrollController(),
+                child: StreamBuilder(
+                  stream: server.getMessageStream(),
+                  builder: (context, snapshot) {
+                    messages += "\n${snapshot.data ?? ""}";
+                    return SizedBox(
+                      width: double.infinity,
+                      child: Text(messages),
+                    );
+                  },
+                ),
+              ),
             ),
-          ),
-          spacer(),
-          ElevatedButton(
-            onPressed: stopButtonClick,
-            style: const ButtonStyle(
-              backgroundColor: MaterialStatePropertyAll(Colors.red),
-            ),
-            child: const Text(
-              "Stop",
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
-          StreamBuilder(
-            stream: server.getMessageStream(),
-            builder: (context, snapshot) {
-              messages += "\n${snapshot.data ?? ""}";
-              return Expanded(
-                child: Text(messages),
-              );
-            },
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -60,6 +85,33 @@ class _TestPageState extends State<TestPage> {
   Widget spacer() {
     return const SizedBox(
       height: 10,
+      width: 10,
+    );
+  }
+
+  Widget startButton() {
+    return ElevatedButton(
+      onPressed: startButtonClick,
+      style: const ButtonStyle(
+        backgroundColor: MaterialStatePropertyAll(Colors.green),
+      ),
+      child: const Text(
+        "Start",
+        style: TextStyle(color: Colors.white),
+      ),
+    );
+  }
+
+  Widget stopButton() {
+    return ElevatedButton(
+      onPressed: stopButtonClick,
+      style: const ButtonStyle(
+        backgroundColor: MaterialStatePropertyAll(Colors.red),
+      ),
+      child: const Text(
+        "Stop",
+        style: TextStyle(color: Colors.white),
+      ),
     );
   }
 
@@ -69,5 +121,27 @@ class _TestPageState extends State<TestPage> {
 
   void stopButtonClick() {
     server.stopServer();
+  }
+
+  Widget testButton() {
+    return ElevatedButton(
+      onPressed: testButtonClick,
+      style: const ButtonStyle(
+        backgroundColor: MaterialStatePropertyAll(Colors.blue),
+      ),
+      child: const Text(
+        "Test",
+        style: TextStyle(color: Colors.white),
+      ),
+    );
+  }
+
+  void testButtonClick() async {
+    Uint8List myImage = await File("assets/szia.png").readAsBytes();
+    Map<String, dynamic> map = {
+      "image": myImage,
+    };
+    bool s = server.sendToClient(jsonEncode(map), 0);
+    print(s ? "Success" : "Fail");
   }
 }

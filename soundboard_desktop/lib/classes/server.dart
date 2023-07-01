@@ -1,44 +1,38 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
 class Server {
-  late final InternetAddress ip;
+  late final InternetAddress ipAddress;
   final int port = 2929;
   bool serverIsRunning = false;
   ServerSocket? _server;
-  final List<Socket> _clients = [];
+  final List<Socket> clients = [];
   final StreamController<String> _messaging = StreamController();
 
   Server() {
-    ip = InternetAddress("192.168.1.150");
+    _setAddress();
+  }
+
+  Future<void> _setAddress() async {
+    var networkinterfaces = await NetworkInterface.list();
+    if (networkinterfaces.isNotEmpty &&
+        networkinterfaces[0].addresses.isNotEmpty) {
+      ipAddress = InternetAddress(networkinterfaces[0].addresses[0].address);
+    }
   }
 
   Future<void> startServer() async {
     if (!serverIsRunning) {
-      _server = await ServerSocket.bind(ip, port);
+      _server = await ServerSocket.bind(ipAddress, port);
       serverIsRunning = true;
-      _messaging.sink.add("Server is running on: ${ip.address}:$port");
-      _server!.listen((event) {
-        _handleClient(event);
+      _messaging.sink.add("Server is running on: ${ipAddress.address}:$port");
+      _server!.listen((client) {
+        clients.add(client);
+        _handleClient(client);
       });
     }
-  }
-
-  void _handleClient(Socket client) {
-    _messaging.sink
-        .add("Server: Client connected with port ${client.remotePort}");
-    client.listen(
-      (Uint8List data) {
-        String message = String.fromCharCodes(data);
-        _messaging.sink.add("Server: $message");
-      },
-      onDone: () {
-        _messaging.sink.add("Client left: ${client.remotePort}");
-        _clients.remove(client);
-        client.close();
-      },
-    );
   }
 
   Future<void> stopServer() async {
@@ -47,6 +41,37 @@ class Server {
       serverIsRunning = false;
       _messaging.add("Server is stopped.");
     }
+  }
+
+  void _handleClient(Socket client) {
+    _messaging.sink
+        .add("Server: Client connected with port ${client.remotePort}");
+    client.listen(
+      (Uint8List data) => _handleReceivedData(data),
+      onDone: () {
+        _messaging.sink.add("Client left: ${client.remotePort}");
+        clients.remove(client);
+        client.close();
+      },
+    );
+  }
+
+  Future<void> _handleReceivedData(Uint8List data) async {
+    String msg = String.fromCharCodes(data);
+    Map<String, dynamic> map = jsonDecode(msg);
+
+    _messaging.sink.add("Client sent data. ($msg)");
+
+    if (map["action"] == "playSound") {
+      print(map["soundId"]);
+    }
+  }
+
+  bool sendToClient(Object data, int index) {
+    print(clients.length);
+    if (clients.length <= index) return false;
+    clients[index].write(data);
+    return true;
   }
 
   Stream<String> getMessageStream() {
