@@ -1,0 +1,4 @@
+enum Action {
+  handshake,
+  playSound,
+}
