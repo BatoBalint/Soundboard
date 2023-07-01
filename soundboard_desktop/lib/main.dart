@@ -11,10 +11,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Orange Soundboard',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.lightBlue, brightness: Brightness.dark),
+            seedColor: Colors.blueGrey, brightness: Brightness.dark),
         useMaterial3: true,
       ),
       debugShowCheckedModeBanner: false,

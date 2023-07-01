@@ -4,6 +4,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:soundboard_desktop/classes/server.dart';
+import 'package:soundboard_desktop/widgets/sound_button.dart';
 
 class TestPage extends StatefulWidget {
   const TestPage({super.key});
@@ -59,6 +60,21 @@ class _TestPageState extends State<TestPage> {
                     stopButton(),
                   ],
                 ),
+              ],
+            ),
+            spacer(),
+            const Wrap(
+              spacing: 20,
+              runSpacing: 40,
+              children: [
+                SoundButton(title: "Elso"),
+                SoundButton(title: "Masodik"),
+                SoundButton(title: "Harmadik"),
+                SoundButton(title: "Negyedik"),
+                SoundButton(title: "Otodik"),
+                SoundButton(title: "Hatodik"),
+                SoundButton(title: "Hetedik"),
+                SoundButton(title: "Egy nagyon hosszu nevu sound"),
               ],
             ),
             Expanded(
