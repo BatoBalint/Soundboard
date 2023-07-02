@@ -1,6 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
+
+import 'package:soundboard_desktop/classes/sound.dart';
 
 class Server {
   late final InternetAddress ipAddress;
@@ -57,9 +60,31 @@ class Server {
 
   Future<void> _handleReceivedData(Uint8List data) async {
     String msg = String.fromCharCodes(data);
-    //Map<String, dynamic> map = jsonDecode(msg);
+    Map<String, dynamic> map = jsonDecode(msg);
 
-    _messaging.sink.add("Client sent data. ($msg)");
+    if (map["clientAction"] == null) return;
+
+    decideAction(map);
+  }
+
+  void decideAction(Map<String, dynamic> map) {
+    switch (map["clientAction"]) {
+      case "playSound":
+        playSound(map["soundName"]);
+        break;
+      case "stopSounds":
+        stopSounds();
+        break;
+      default:
+    }
+  }
+
+  void playSound(String soundName) {
+    Sound.sounds[soundName]?.play();
+  }
+
+  void stopSounds() {
+    Sound.stopAll();
   }
 
   bool sendToClient(Object data, int index) {

@@ -1,9 +1,8 @@
-import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:soundboard_desktop/classes/server.dart';
+import 'package:soundboard_desktop/classes/sound.dart';
 import 'package:soundboard_desktop/widgets/sound_button.dart';
 
 class TestPage extends StatefulWidget {
@@ -63,18 +62,24 @@ class _TestPageState extends State<TestPage> {
               ],
             ),
             spacer(),
-            const Wrap(
+            Wrap(
               spacing: 20,
               runSpacing: 40,
               children: [
-                SoundButton(title: "Muzsika", fileName: "test.mp3"),
-                SoundButton(title: "Masodik"),
-                SoundButton(title: "Harmadik"),
-                SoundButton(title: "Negyedik"),
-                SoundButton(title: "Otodik"),
-                SoundButton(title: "Hatodik"),
-                SoundButton(title: "Hetedik"),
-                SoundButton(title: "Egy nagyon hosszu nevu sound"),
+                SoundButton(
+                  title: "Stop",
+                  buttonFunction: () => Sound.stopAll(),
+                  buttonColor: const Color.fromARGB(255, 151, 29, 20),
+                  checkPlayerState: false,
+                ),
+                const SoundButton(title: "Muzsika", fileName: "test.mp3"),
+                const SoundButton(title: "Masodik"),
+                const SoundButton(title: "Harmadik"),
+                const SoundButton(title: "Negyedik"),
+                const SoundButton(title: "Otodik"),
+                const SoundButton(title: "Hatodik"),
+                const SoundButton(title: "Hetedik"),
+                const SoundButton(title: "Egy nagyon hosszu nevu sound"),
               ],
             ),
             Expanded(
@@ -153,10 +158,11 @@ class _TestPageState extends State<TestPage> {
   }
 
   void testButtonClick() async {
-    Uint8List myImage = await File("assets/szia.png").readAsBytes();
-    Map<String, dynamic> map = {
-      "image": myImage,
-    };
-    server.sendToClient(jsonEncode(map), 0);
+    //Sound.sounds["Muzsika"]?.play();
+    // Uint8List myImage = await File("assets/szia.png").readAsBytes();
+    // Map<String, dynamic> map = {
+    //   "image": myImage,
+    // };
+    // server.sendToClient(jsonEncode(map), 0);
   }
 }
