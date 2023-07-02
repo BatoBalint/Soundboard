@@ -67,7 +67,7 @@ class _TestPageState extends State<TestPage> {
               spacing: 20,
               runSpacing: 40,
               children: [
-                SoundButton(title: "Elso"),
+                SoundButton(title: "Muzsika", fileName: "test.mp3"),
                 SoundButton(title: "Masodik"),
                 SoundButton(title: "Harmadik"),
                 SoundButton(title: "Negyedik"),
