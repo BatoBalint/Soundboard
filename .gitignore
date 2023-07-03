@@ -1,0 +1,14 @@
+soundboard_desktop/linux/flutter/generated_plugin_registrant.cc
+soundboard_desktop/linux/flutter/generated_plugin_registrant.h
+soundboard_desktop/linux/flutter/generated_plugins.cmake
+soundboard_desktop/macos/Flutter/GeneratedPluginRegistrant.swift
+soundboard_desktop/windows/flutter/generated_plugin_registrant.cc
+soundboard_desktop/windows/flutter/generated_plugin_registrant.h
+soundboard_desktop/windows/flutter/generated_plugins.cmake
+soundboard_mobile/linux/flutter/generated_plugin_registrant.cc
+soundboard_mobile/linux/flutter/generated_plugin_registrant.h
+soundboard_mobile/linux/flutter/generated_plugins.cmake
+soundboard_mobile/macos/Flutter/GeneratedPluginRegistrant.swift
+soundboard_mobile/windows/flutter/generated_plugin_registrant.cc
+soundboard_mobile/windows/flutter/generated_plugin_registrant.h
+soundboard_mobile/windows/flutter/generated_plugins.cmake
