@@ -12,10 +12,7 @@ class Server {
   ServerSocket? _server;
   final List<Socket> clients = [];
   final StreamController<String> _messaging = StreamController();
-
-  Server() {
-    _setAddress();
-  }
+  Future? waitFor;
 
   Future<void> _setAddress() async {
     var networkinterfaces = await NetworkInterface.list();
@@ -26,6 +23,7 @@ class Server {
   }
 
   Future<void> startServer() async {
+    await _setAddress();
     if (!serverIsRunning) {
       _server = await ServerSocket.bind(ipAddress, port);
       serverIsRunning = true;

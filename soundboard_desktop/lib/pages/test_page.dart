@@ -30,6 +30,12 @@ class _TestPageState extends State<TestPage> {
     super.initState();
     getIpAddress();
     loadSounds();
+    startServer();
+  }
+
+  startServer() async {
+    await server.startServer();
+    setState(() {});
   }
 
   loadSounds() async {
