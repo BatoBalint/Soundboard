@@ -6,8 +6,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:soundboard_desktop/classes/sound_settings.dart';
 
 class Sound {
-  final String applicationFolderName = "OrangeSoundboard";
-
   static List<AudioPlayer> audioPlayers = [];
   static Map<String, Sound> sounds = {};
 
@@ -16,8 +14,14 @@ class Sound {
   final String? fileName;
   bool ableToPlay = false;
   StreamController<bool>? playerState;
+  double soundVolume;
 
-  Sound({required this.soundName, this.fileName}) {
+  Sound({required this.soundName, this.fileName, this.soundVolume = 1}) {
+    if (soundVolume > 1) {
+      soundVolume = 1;
+    } else if (soundVolume < 0) {
+      soundVolume = 0;
+    }
     _audioPlayer = AudioPlayer();
     _audioPlayer.setVolume(0.1);
     playerState = StreamController();
@@ -31,7 +35,7 @@ class Sound {
       Directory dir = await getApplicationDocumentsDirectory();
       checkApplicationFolder(dir);
       await _audioPlayer.setSourceDeviceFile(
-          "${dir.path}\\$applicationFolderName\\$fileName");
+          "${dir.path}\\${SoundSettings.applicationFolderName}\\$soundName\\$fileName");
       ableToPlay = true;
       audioPlayers.add(_audioPlayer);
     } catch (ex) {
@@ -41,7 +45,8 @@ class Sound {
   }
 
   void checkApplicationFolder(Directory docDir) {
-    Directory dir = Directory("${docDir.path}\\$applicationFolderName");
+    Directory dir =
+        Directory("${docDir.path}\\${SoundSettings.applicationFolderName}");
     if (!dir.existsSync()) dir.createSync();
   }
 
@@ -75,6 +80,6 @@ class Sound {
   }
 
   void checkSettings() {
-    setVolume(SoundSettings.volume);
+    setVolume(SoundSettings.volume * soundVolume);
   }
 }

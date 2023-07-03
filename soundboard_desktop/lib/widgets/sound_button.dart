@@ -34,36 +34,37 @@ class _SoundButtonState extends State<SoundButton> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<bool>(
-        initialData: !widget.checkPlayerState,
-        stream: sound!.getPlayerStateStream(),
-        builder: (context, snapshot) {
-          return ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              padding: const EdgeInsets.all(0),
-              backgroundColor: (snapshot.data ?? !widget.checkPlayerState)
-                  ? widget.buttonColor
-                  : disabledColor,
+      initialData: !widget.checkPlayerState,
+      stream: sound!.getPlayerStateStream(),
+      builder: (context, snapshot) {
+        return ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
             ),
-            onPressed: buttonClick,
-            child: SizedBox(
-              width: 120,
-              height: 120,
-              child: Center(
-                child: Container(
-                  alignment: Alignment.center,
-                  child: Text(
-                    widget.title,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 18),
-                  ),
+            padding: const EdgeInsets.all(0),
+            backgroundColor: (snapshot.data ?? !widget.checkPlayerState)
+                ? widget.buttonColor
+                : disabledColor,
+          ),
+          onPressed: buttonClick,
+          child: SizedBox(
+            width: 120,
+            height: 120,
+            child: Center(
+              child: Container(
+                alignment: Alignment.center,
+                child: Text(
+                  widget.title,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 18),
                 ),
               ),
             ),
-          );
-        });
+          ),
+        );
+      },
+    );
   }
 
   Future<void> buttonClick() async {
