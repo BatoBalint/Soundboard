@@ -141,7 +141,9 @@ class _TestPageState extends State<TestPage> {
     );
   }
 
-  void testButtonClick() async {}
+  void testButtonClick() async {
+    Sound.sounds["ASDASD"]?.play();
+  }
 
   Widget addSoundButton() {
     return ElevatedButton(

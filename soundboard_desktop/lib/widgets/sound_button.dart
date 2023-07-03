@@ -68,15 +68,6 @@ class _SoundButtonState extends State<SoundButton> {
   }
 
   Future<void> buttonClick() async {
-    SnackBar s = SnackBar(
-      content: Text(
-        widget.title,
-        style: const TextStyle(color: Colors.white70),
-      ),
-      backgroundColor: Colors.black,
-    );
-    ScaffoldMessenger.of(context).showSnackBar(s);
-
     if (widget.buttonFunction != null) {
       widget.buttonFunction!();
     } else {

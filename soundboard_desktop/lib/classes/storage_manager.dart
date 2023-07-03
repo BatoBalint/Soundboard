@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
 import 'package:soundboard_desktop/classes/sound.dart';
-import 'package:soundboard_desktop/classes/sound_settings.dart';
+import 'package:soundboard_desktop/classes/global_settings.dart';
 
 class StorageManager {
   Directory? _appDir;
@@ -50,7 +50,9 @@ class StorageManager {
     };
     List<Sound> sounds = Sound.sounds.values.toList();
     if (newSound != null) sounds.add(newSound);
+    print("Sounds length: ${sounds.length}");
     for (Sound sound in sounds) {
+      print("Converting: ${sound.soundName}");
       map["sounds"].add(sound.toJSONObject());
     }
 

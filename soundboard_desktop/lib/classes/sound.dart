@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:soundboard_desktop/classes/sound_settings.dart';
+import 'package:soundboard_desktop/classes/global_settings.dart';
 
 class Sound {
   static List<AudioPlayer> audioPlayers = [];
@@ -44,6 +44,7 @@ class Sound {
       await _audioPlayer.setSourceDeviceFile(filepath!);
       ableToPlay = true;
       audioPlayers.add(_audioPlayer);
+      sounds[soundName] = this;
     } catch (ex) {
       ableToPlay = false;
     }
@@ -64,6 +65,9 @@ class Sound {
   Future<void> play() async {
     if (!ableToPlay) return;
     checkSettings();
+    if (!GlobalSettings.canPlayMultiple) {
+      Sound.stopAll();
+    }
     if (GlobalSettings.restartSoundOnPlay) {
       await _audioPlayer.stop();
     }
