@@ -50,9 +50,7 @@ class StorageManager {
     };
     List<Sound> sounds = Sound.sounds.values.toList();
     if (newSound != null) sounds.add(newSound);
-    print("Sounds length: ${sounds.length}");
     for (Sound sound in sounds) {
-      print("Converting: ${sound.soundName}");
       map["sounds"].add(sound.toJSONObject());
     }
 
