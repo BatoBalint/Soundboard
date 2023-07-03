@@ -63,7 +63,12 @@ class _TestPageState extends State<TestPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Ip address: $_deviceIpAddress"),
+                Text(
+                  "${server.serverIsRunning ? "Server is running on " : "Local ip: "}$_deviceIpAddress",
+                  style: TextStyle(
+                    color: server.serverIsRunning ? Colors.green : Colors.red,
+                  ),
+                ),
                 Row(
                   children: [
                     testButton(),
@@ -120,12 +125,14 @@ class _TestPageState extends State<TestPage> {
     );
   }
 
-  void startButtonClick() {
-    server.startServer();
+  void startButtonClick() async {
+    await server.startServer();
+    setState(() {});
   }
 
-  void stopButtonClick() {
-    server.stopServer();
+  void stopButtonClick() async {
+    await server.stopServer();
+    setState(() {});
   }
 
   Widget testButton() {
