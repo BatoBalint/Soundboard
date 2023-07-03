@@ -139,7 +139,7 @@ class _TestPageState extends State<TestPage> {
   }
 
   void testButtonClick() async {
-    Sound.sounds["ASDASD"]?.play();
+    Sound.sounds["EZ4ENCE"]?.play();
   }
 
   Widget addSoundButton() {
