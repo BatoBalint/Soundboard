@@ -9,14 +9,22 @@ class Sound {
   static List<AudioPlayer> audioPlayers = [];
   static Map<String, Sound> sounds = {};
 
-  String soundName;
   late AudioPlayer _audioPlayer;
-  final String? fileName;
-  bool ableToPlay = false;
+  final String? filepath;
+  final String? imagepath;
+  String soundName;
   StreamController<bool>? playerState;
+  bool ableToPlay = false;
   double soundVolume;
 
-  Sound({required this.soundName, this.fileName, this.soundVolume = 1}) {
+  Future? loading;
+
+  Sound({
+    required this.soundName,
+    this.filepath,
+    this.imagepath,
+    this.soundVolume = 1,
+  }) {
     if (soundVolume > 1) {
       soundVolume = 1;
     } else if (soundVolume < 0) {
@@ -25,28 +33,27 @@ class Sound {
     _audioPlayer = AudioPlayer();
     _audioPlayer.setVolume(0.1);
     playerState = StreamController();
-    _loadAudio();
-    sounds[soundName] = this;
+    loading = _loadAudio();
   }
 
   Future<void> _loadAudio() async {
-    if (fileName == null) return;
+    if (filepath == null || filepath!.isEmpty) return;
     try {
       Directory dir = await getApplicationDocumentsDirectory();
       checkApplicationFolder(dir);
-      await _audioPlayer.setSourceDeviceFile(
-          "${dir.path}\\${SoundSettings.applicationFolderName}\\$soundName\\$fileName");
+      await _audioPlayer.setSourceDeviceFile(filepath!);
       ableToPlay = true;
       audioPlayers.add(_audioPlayer);
     } catch (ex) {
       ableToPlay = false;
     }
     playerState!.sink.add(ableToPlay);
+    loading = null;
   }
 
   void checkApplicationFolder(Directory docDir) {
-    Directory dir =
-        Directory("${docDir.path}\\${SoundSettings.applicationFolderName}");
+    Directory dir = Directory(
+        "${docDir.path}\\${GlobalSettings.applicationFolderName}\\$soundName");
     if (!dir.existsSync()) dir.createSync();
   }
 
@@ -57,7 +64,7 @@ class Sound {
   Future<void> play() async {
     if (!ableToPlay) return;
     checkSettings();
-    if (SoundSettings.restartSoundOnPlay) {
+    if (GlobalSettings.restartSoundOnPlay) {
       await _audioPlayer.stop();
     }
     await _audioPlayer.resume();
@@ -80,6 +87,15 @@ class Sound {
   }
 
   void checkSettings() {
-    setVolume(SoundSettings.volume * soundVolume);
+    setVolume(GlobalSettings.volume * soundVolume);
+  }
+
+  Map<String, dynamic>? toJSONObject() {
+    if (filepath == null || filepath!.isEmpty) return null;
+    return {
+      "name": soundName,
+      "filepath": filepath,
+      "imagepath": imagepath ?? "",
+    };
   }
 }

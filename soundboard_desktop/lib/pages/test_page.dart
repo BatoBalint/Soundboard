@@ -2,10 +2,9 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:soundboard_desktop/classes/server.dart';
 import 'package:soundboard_desktop/classes/sound.dart';
-import 'package:soundboard_desktop/classes/sound_settings.dart';
+import 'package:soundboard_desktop/classes/storage_manager.dart';
 import 'package:soundboard_desktop/widgets/sound_button.dart';
 
 class TestPage extends StatefulWidget {
@@ -16,11 +15,12 @@ class TestPage extends StatefulWidget {
 }
 
 class _TestPageState extends State<TestPage> {
+  StorageManager sm = StorageManager();
   Server server = Server();
-  String messages = "";
   String _deviceIpAddress = "";
   String errorMessage = "";
-  Image img = Image.asset("assets/szia.png");
+
+  List<Sound> sounds = [];
 
   TextEditingController titleController = TextEditingController();
   TextEditingController fileController = TextEditingController();
@@ -29,6 +29,13 @@ class _TestPageState extends State<TestPage> {
   void initState() {
     super.initState();
     getIpAddress();
+    loadSounds();
+  }
+
+  loadSounds() async {
+    if (sounds.isEmpty) {
+      sounds = await sm.readSavedSounds();
+    } else {}
   }
 
   Future<void> getIpAddress() async {
@@ -72,30 +79,7 @@ class _TestPageState extends State<TestPage> {
             Wrap(
               spacing: 20,
               runSpacing: 40,
-              children: [
-                addSoundButton(),
-                SoundButton(
-                  title: "Stop",
-                  buttonFunction: () => Sound.stopAll(),
-                  buttonColor: const Color.fromARGB(255, 151, 29, 20),
-                  checkPlayerState: false,
-                ),
-              ],
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                controller: ScrollController(),
-                child: StreamBuilder(
-                  stream: server.getMessageStream(),
-                  builder: (context, snapshot) {
-                    messages += "\n${snapshot.data ?? ""}";
-                    return SizedBox(
-                      width: double.infinity,
-                      child: Text(messages),
-                    );
-                  },
-                ),
-              ),
+              children: soundbuttons(),
             ),
           ],
         ),
@@ -157,14 +141,7 @@ class _TestPageState extends State<TestPage> {
     );
   }
 
-  void testButtonClick() async {
-    //Sound.sounds["Muzsika"]?.play();
-    // Uint8List myImage = await File("assets/szia.png").readAsBytes();
-    // Map<String, dynamic> map = {
-    //   "image": myImage,
-    // };
-    // server.sendToClient(jsonEncode(map), 0);
-  }
+  void testButtonClick() async {}
 
   Widget addSoundButton() {
     return ElevatedButton(
@@ -195,10 +172,10 @@ class _TestPageState extends State<TestPage> {
     );
   }
 
-  void addSoundButtonClicked() {
+  Future<void> addSoundButtonClicked() async {
     titleController.text = "";
     fileController.text = "";
-    showDialog(
+    await showDialog(
       barrierDismissible: false,
       context: context,
       builder: (context) {
@@ -373,22 +350,41 @@ class _TestPageState extends State<TestPage> {
   Future<void> saveNewSound(ss) async {
     if (!validateTitleInput(ss) || !validateFileInput(ss)) return;
 
-    File file = File(fileController.text);
-    Directory parentDir = await getApplicationDocumentsDirectory();
-    Directory targetDir = Directory(
-        "${parentDir.path}\\${SoundSettings.applicationFolderName}\\${titleController.text}");
-    if (!targetDir.existsSync()) {
-      targetDir.create(recursive: false);
-    }
-    try {
-      await file.copy(
-        "${targetDir.path}\\${file.path.substring(file.path.lastIndexOf("\\") + 1, file.path.length)}",
-      );
-    } catch (ex) {
+    Sound? newSound = await sm.createNewSound(
+      titleController.text.trim(),
+      fileController.text,
+    );
+
+    if (newSound == null) {
       ss(() {
         errorMessage = "Couldn't copy the sound to the application folder.";
       });
+    } else {
+      setState(() {
+        sounds.add(newSound);
+      });
     }
+  }
+
+  List<Widget> soundbuttons() {
+    List<Widget> children = [
+      addSoundButton(),
+      SoundButton(
+        title: "Stop",
+        buttonFunction: () => Sound.stopAll(),
+        buttonColor: const Color.fromARGB(255, 151, 29, 20),
+        textColor: Colors.white,
+        checkPlayerState: false,
+      ),
+    ];
+    for (Sound sound in sounds) {
+      children.add(SoundButton(
+        title: sound.soundName,
+        sound: sound,
+        checkPlayerState: true,
+      ));
+    }
+    return children;
   }
 
   bool validateTitleInput(Function ss) {
