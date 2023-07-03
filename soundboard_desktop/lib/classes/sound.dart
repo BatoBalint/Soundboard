@@ -30,7 +30,7 @@ class Sound {
     try {
       Directory dir = await getApplicationDocumentsDirectory();
       checkApplicationFolder(dir);
-      _audioPlayer.setSourceDeviceFile(
+      await _audioPlayer.setSourceDeviceFile(
           "${dir.path}\\$applicationFolderName\\$fileName");
       ableToPlay = true;
       audioPlayers.add(_audioPlayer);
