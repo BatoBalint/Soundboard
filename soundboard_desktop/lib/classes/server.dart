@@ -6,7 +6,7 @@ import 'dart:typed_data';
 import 'package:soundboard_desktop/classes/sound.dart';
 
 class Server {
-  late final InternetAddress ipAddress;
+  InternetAddress? ipAddress;
   final int port = 2929;
   bool serverIsRunning = false;
   ServerSocket? _server;
@@ -27,7 +27,7 @@ class Server {
     if (!serverIsRunning) {
       _server = await ServerSocket.bind(ipAddress, port);
       serverIsRunning = true;
-      _messaging.sink.add("Server is running on: ${ipAddress.address}:$port");
+      _messaging.sink.add("Server is running on: ${ipAddress!.address}:$port");
       _server!.listen((client) {
         clients.add(client);
         _handleClient(client);

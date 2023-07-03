@@ -17,7 +17,6 @@ class TestPage extends StatefulWidget {
 class _TestPageState extends State<TestPage> {
   StorageManager sm = StorageManager();
   Server server = Server();
-  String _deviceIpAddress = "";
   String errorMessage = "";
 
   List<Sound> sounds = [];
@@ -28,7 +27,6 @@ class _TestPageState extends State<TestPage> {
   @override
   void initState() {
     super.initState();
-    getIpAddress();
     loadSounds();
     startServer();
   }
@@ -44,20 +42,6 @@ class _TestPageState extends State<TestPage> {
     } else {}
   }
 
-  Future<void> getIpAddress() async {
-    var networkinterfaces = await NetworkInterface.list();
-    if (networkinterfaces.isNotEmpty &&
-        networkinterfaces[0].addresses.isNotEmpty) {
-      setState(() {
-        _deviceIpAddress = networkinterfaces[0].addresses[0].address;
-      });
-    } else {
-      setState(() {
-        _deviceIpAddress = "N/A";
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -70,7 +54,7 @@ class _TestPageState extends State<TestPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "${server.serverIsRunning ? "Server is running on " : "Local ip: "}$_deviceIpAddress",
+                  "${server.serverIsRunning ? "Server is running on " : "Local ip: "}${server.ipAddress?.address}",
                   style: TextStyle(
                     color: server.serverIsRunning ? Colors.green : Colors.red,
                   ),
